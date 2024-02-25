@@ -1,5 +1,5 @@
 # koreatech-board-client
-[Compose multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 을 사용한 한국기술대학교 게시판 클라이언트
+[Compose multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 을 사용한 한국기술교육대학교 게시판 클라이언트
 
 ## 지원하는 플랫폼
 * Android
