@@ -12,6 +12,6 @@ class BoardRepositoryImpl(private val boardRemoteDataSource: BoardRemoteDataSour
     override suspend fun getBoardMinimum(site: String, board: String): APIResult<Board> {
         val response = boardRemoteDataSource.getBoardMinimum(site, board)
         val data: BoardResponse = response.body()
-        return data.mapToBoard(response.status.value)
+        return data.mapToBoard()
     }
 }

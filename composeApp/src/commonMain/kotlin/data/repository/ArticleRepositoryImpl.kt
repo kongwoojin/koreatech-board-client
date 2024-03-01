@@ -14,6 +14,6 @@ class ArticleRepositoryImpl(private val articleRemoteDataSource: ArticleRemoteDa
     override suspend fun getArticle(site: String, uuid: Uuid): APIResult<Article> {
         val response = articleRemoteDataSource.getArticle(site, uuid)
         val data: ArticleResponse = response.body()
-        return data.mapToArticle(response.status.value)
+        return data.mapToArticle()
     }
 }

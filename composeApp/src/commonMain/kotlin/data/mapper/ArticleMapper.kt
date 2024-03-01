@@ -7,7 +7,7 @@ import domain.model.Article
 import domain.model.Files
 
 
-fun ArticleResponse.mapToArticle(code: Int): APIResult<Article> {
+fun ArticleResponse.mapToArticle(): APIResult<Article> {
     val mappedFileList = ArrayList<Files>()
 
     if (this.files.isNotEmpty()) {
@@ -21,10 +21,10 @@ fun ArticleResponse.mapToArticle(code: Int): APIResult<Article> {
         }
     }
 
-    return if (code == 200) {
+    return if (this.statusCode == 200) {
         APIResult.Success(
             Article(
-                statusCode = code,
+                statusCode = this.statusCode,
                 title = this.title,
                 writer = this.writer,
                 content = this.content,
@@ -34,6 +34,6 @@ fun ArticleResponse.mapToArticle(code: Int): APIResult<Article> {
             )
         )
     } else {
-        APIResult.Error(ErrorType(code))
+        APIResult.Error(ErrorType(this.statusCode, this.error))
     }
 }

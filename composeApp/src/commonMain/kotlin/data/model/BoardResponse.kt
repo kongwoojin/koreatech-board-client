@@ -6,10 +6,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BoardResponse(
+    @SerialName("status_code")
+    val statusCode: Int,
     @SerialName("last_page")
     val lastPage: Int,
     @SerialName("posts")
-    val boardData: List<BoardResponseData>?
+    val boardData: List<BoardResponseData>?,
+    @SerialName("error")
+    val error: String
 )
 
 @Serializable
