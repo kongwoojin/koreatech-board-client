@@ -1,9 +1,15 @@
 package ui.home
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,11 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.benasher44.uuid.Uuid
-import com.benasher44.uuid.uuidFrom
 import getPlatform
 import koreatechboard.composeapp.generated.resources.Res
-import koreatechboard.composeapp.generated.resources.app_name
 import koreatechboard.composeapp.generated.resources.error_retry
 import koreatechboard.composeapp.generated.resources.error_server_down
 import kotlinx.coroutines.launch
@@ -24,9 +27,7 @@ import moe.tlaster.precompose.koin.koinViewModel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import routes.Department
-import ui.theme.notoSansKR
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
     openArticle: (String, String) -> Unit = { _, _ -> }
@@ -53,7 +54,8 @@ fun BoardInMain(
 ) {
     val viewModel = koinViewModel(
         vmClass = HomeBoardViewModel::class,
-        key = department.name)
+        key = department.name
+    )
 
     val key = remember {
         mutableStateOf(department.boards[0].board)

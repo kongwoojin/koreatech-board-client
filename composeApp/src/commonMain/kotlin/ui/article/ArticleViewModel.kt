@@ -1,61 +1,61 @@
 package ui.article
 
 import androidx.compose.runtime.mutableStateOf
+import ui.base.BaseViewModel
 import com.benasher44.uuid.Uuid
 import domain.base.APIResult
 import domain.model.Article
 import domain.usecase.GetArticleUseCase
 import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-
-class ArticleViewModel constructor(
-    private val getArticleUseCase: GetArticleUseCase
-) : ViewModel() {
+class ArticleViewModel(private val getArticleUseCase: GetArticleUseCase) : BaseViewModel<ArticleState, ArticleEvent>(ArticleState()) {
     val article = mutableStateOf(Article())
-
-    private val uuid = mutableStateOf(Uuid(0, 0))
-
-    private val site = mutableStateOf("")
-
-    private val isLoading = mutableStateOf(false)
-
-    private val statusCode = mutableStateOf(200)
-
-    private val url = mutableStateOf("")
 
     fun getArticleData() {
         viewModelScope.launch {
-            isLoading.value = true
-
+            sendEvent(ArticleEvent.Loading)
             runCatching {
-                getArticleUseCase(site.value, uuid.value)
+                getArticleUseCase(uiState.value.site, uiState.value.uuid)
             }.onSuccess {
                 when (it) {
                     is APIResult.Success -> {
+                        sendEvent(ArticleEvent.Success(it.data.statusCode, it.data.articleUrl))
                         article.value = it.data
-                        statusCode.value = it.data.statusCode
-                        url.value = it.data.articleUrl
                     }
 
                     is APIResult.Error -> {
-                        statusCode.value = it.errorType.statusCode
+                        sendEvent(ArticleEvent.Error(it.errorType.statusCode, it.errorType.message))
                     }
                 }
             }.onFailure {
-                println(it.message)
+                sendEvent(ArticleEvent.Failed(it.message ?: ""))
             }
-
-            isLoading.value = false
         }
     }
 
     fun setSiteData(site: String) {
-        this.site.value = site
+        setState(uiState.value.copy(site = site))
     }
 
     fun setUUIDData(uuid: Uuid) {
-        this.uuid.value = uuid
+        setState(uiState.value.copy(uuid = uuid))
+    }
+
+    override fun reduce(oldState: ArticleState, event: ArticleEvent) {
+        when (event) {
+            ArticleEvent.Loading -> {
+                setState(oldState.copy(isLoaded = false))
+            }
+            is ArticleEvent.Error -> {
+                setState(oldState.copy(isLoaded = true, isSuccess = false, statusCode = event.statusCode, errorMessage = event.errorMessage))
+            }
+            is ArticleEvent.Failed -> {
+                setState(oldState.copy(isLoaded = true, isSuccess = false, errorMessage = event.errorMessage))
+            }
+            is ArticleEvent.Success -> {
+                setState(oldState.copy(isLoaded = true, isSuccess = true, statusCode = event.statusCode, url = event.articleUrl))
+            }
+        }
     }
 }
